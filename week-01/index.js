@@ -1,5 +1,7 @@
 "use strict";
 
+// NB: "normal" numbers in JavaScript are 64-bit floats.
+
 function makeArray(length) {
     var array = new Array(length);
 
@@ -11,7 +13,7 @@ function makeArray(length) {
 }
 
 function makeInt32Array(length) {
-    var arrayBuffer = new ArrayBuffer(length);
+    var arrayBuffer = new ArrayBuffer(length * 4); // 4 = number of bytes in an int32
     var view = new Int32Array(arrayBuffer);
 
     for (var i = 0; i < length; ++i) {
@@ -26,7 +28,7 @@ function makeInt32Array(length) {
 // caches, but if you're impatient, keep it lower. A good medium is 4 * 1024 * 1024.
 var SIZE = 1024 * 1024;
 
-xsuite("Access every k-th entry [arrays]", function () {
+suite("Access every k-th entry [arrays]", function () {
     var stepValues = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
 
     var arrays = stepValues.map(function () { return makeArray(SIZE); });
@@ -41,7 +43,7 @@ xsuite("Access every k-th entry [arrays]", function () {
     });
 });
 
-xsuite("Access every k-th entry [ArrayBuffers]", function () {
+suite("Access every k-th entry [ArrayBuffers]", function () {
     var stepValues = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024];
 
     var views = stepValues.map(function () { return makeInt32Array(SIZE); });
@@ -83,5 +85,45 @@ suite("Modify every cache line in an ArrayBuffer", function () {
                 ++view[(j * 16) % view.length];
             }
         });
+    });
+});
+
+suite("Try to exploit instruction-level parallelism [arrays]", function () {
+    bench("Modifying the same array element", function () {
+        var array = makeArray(2);
+
+        for (var i = 0; i < SIZE; ++i) {
+            ++array[0];
+            ++array[0];
+        }
+    });
+
+    bench("Modifying two different array elements", function () {
+        var array = makeArray(2);
+
+        for (var i = 0; i < SIZE; ++i) {
+            ++array[0];
+            ++array[1];
+        }
+    });
+});
+
+suite("Try to exploit instruction-level parallelism [ArrayBuffers]", function () {
+    bench("Modifying the same array element", function () {
+        var view = makeInt32Array(2);
+
+        for (var i = 0; i < SIZE; ++i) {
+            ++view[0];
+            ++view[0];
+        }
+    });
+
+    bench("Modifying two different array elements", function () {
+        var view = makeInt32Array(2);
+
+        for (var i = 0; i < SIZE; ++i) {
+            ++view[0];
+            ++view[1];
+        }
     });
 });
