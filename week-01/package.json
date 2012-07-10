@@ -1,0 +1,13 @@
+{
+    "name": "csh-week-01",
+    "version": "0.0.0",
+    "description": "CS for Hackers Week 1 Homework",
+    "scripts": {
+        "start": "matcha index.js"
+    },
+    "author": "Domenic Denicola <domenic@domenicdenicola.com> (http://domenicdenicola.com)",
+    "license": "WTFPL",
+    "dependencies": {
+        "matcha": "~0.1.1"
+    }
+}
