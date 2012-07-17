@@ -1,5 +1,7 @@
 "use strict";
 
+// Based heavily on http://igoro.com/archive/gallery-of-processor-cache-effects/, but IN JAVASCRIPT!
+
 // NB: "normal" numbers in JavaScript are 64-bit floats.
 
 function makeArray(length) {
@@ -25,7 +27,7 @@ function makeInt32Array(length) {
 
 // This generically controls how big things are/how many steps we do. Node starts out-of-memorying and/or getting
 // really slow around 16 * 1024 * 1024 (on my machine). Bigger will probably be more accurate and resilient to
-// caches, but if you're impatient, keep it lower. A good medium is 4 * 1024 * 1024.
+// caches, but if you're impatient, keep it lower. A good medium is 4 * 1024 * 1024 (on desktops).
 var SIZE = 1024 * 1024;
 
 suite("Access every k-th entry [arrays]", function () {
@@ -58,7 +60,7 @@ suite("Access every k-th entry [ArrayBuffers]", function () {
     });
 });
 
-suite("Modify every cache line in an array", function () {
+suite("Find the cache line size [arrays]", function () {
     var arraySizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2 * 1024, 4 * 1024, 8 * 1024, 16 * 1024]; // in KiB
 
     var arrays = arraySizes.map(function (size) { return makeArray(size * 1024); });
@@ -73,7 +75,7 @@ suite("Modify every cache line in an array", function () {
     });
 });
 
-suite("Modify every cache line in an ArrayBuffer", function () {
+suite("Find the cache line size [ArrayBuffers]", function () {
     var arraySizes = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2 * 1024, 4 * 1024, 8 * 1024, 16 * 1024]; // in KiB
 
     var views = arraySizes.map(function (size) { return makeInt32Array(size * 1024); });
@@ -88,7 +90,7 @@ suite("Modify every cache line in an ArrayBuffer", function () {
     });
 });
 
-suite("Try to exploit instruction-level parallelism [arrays]", function () {
+suite("Demonstrate instruction-level parallelism [arrays]", function () {
     bench("Modifying the same array element", function () {
         var array = makeArray(2);
 
@@ -108,7 +110,7 @@ suite("Try to exploit instruction-level parallelism [arrays]", function () {
     });
 });
 
-suite("Try to exploit instruction-level parallelism [ArrayBuffers]", function () {
+suite("Demonstrate instruction-level parallelism [ArrayBuffers]", function () {
     bench("Modifying the same array element", function () {
         var view = makeInt32Array(2);
 
